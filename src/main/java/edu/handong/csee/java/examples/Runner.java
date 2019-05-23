@@ -6,27 +6,44 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import java.io.File;
 
 public class Runner {
 	
 	String path;
 	boolean verbose;
 	boolean help;
+	boolean fullp;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 
 		Runner myRunner = new Runner();
 		myRunner.run(args);
 
 	}
 
-	private void run(String[] args) {
+	private void run(String[] args) 
+	{
 		Options options = createOptions();
 		
-		if(parseOptions(options, args)){
-			if (help){
+		if(parseOptions(options, args))
+		{
+			if (help)
+			{
 				printHelp(options);
 				return;
+			}
+			
+			if (fullp == true)
+			{
+				File fp = new File(path);
+				
+				for (File file:fp.listFiles())
+				{
+					System.out.println(file.getName());
+					System.out.println(file.getAbsolutePath());
+				}
 			}
 			
 			// path is required (necessary) data so no need to have a branch.
@@ -34,7 +51,8 @@ public class Runner {
 			
 			// TODO show the number of files in the path
 			
-			if(verbose) {
+			if(verbose) 
+			{
 				
 				// TODO list all files in the path
 				
@@ -43,18 +61,23 @@ public class Runner {
 		}
 	}
 
-	private boolean parseOptions(Options options, String[] args) {
+	private boolean parseOptions(Options options, String[] args) 
+	{
 		CommandLineParser parser = new DefaultParser();
 
-		try {
+		try 
+		{
 
 			CommandLine cmd = parser.parse(options, args);
 
 			path = cmd.getOptionValue("p");
 			verbose = cmd.hasOption("v");
 			help = cmd.hasOption("h");
+			fullp = cmd.hasOption("f");
 
-		} catch (Exception e) {
+		} catch (Exception e) 
+		
+		{
 			printHelp(options);
 			return false;
 		}
@@ -63,7 +86,8 @@ public class Runner {
 	}
 
 	// Definition Stage
-	private Options createOptions() {
+	private Options createOptions() 
+	{
 		Options options = new Options();
 
 		// add options by using OptionBuilder
@@ -74,6 +98,13 @@ public class Runner {
 				.required()
 				.build());
 
+		// add options by using OptionBuilder
+		options.addOption(Option.builder("f").longOpt("fullpath")
+				.desc("Set a full path of a directory or a file to display")
+				.hasArg()
+				.build());
+
+		
 		// add options by using OptionBuilder
 		options.addOption(Option.builder("v").longOpt("verbose")
 				.desc("Display detailed messages!")
@@ -90,12 +121,14 @@ public class Runner {
 		return options;
 	}
 	
-	private void printHelp(Options options) {
+	private void printHelp(Options options) 
+	{
 		// automatically generate the help statement
 		HelpFormatter formatter = new HelpFormatter();
 		String header = "CLI test program";
 		String footer ="\nPlease report issues at https://github.com/lifove/CLIExample/issues";
 		formatter.printHelp("CLIExample", header, options, footer, true);
 	}
-
+	
+	
 }
